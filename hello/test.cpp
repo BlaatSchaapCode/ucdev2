@@ -21,5 +21,5 @@ int cppTest::getA(void) {
 cppTest test;
 void cpptest(void) {
 
-	printf("a is %s\n", test.getA());
+	printf("a is %d\n", test.getA());
 }
