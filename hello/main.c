@@ -58,9 +58,12 @@ void uart_init() {
 	HAL_UARTEx_ReceiveToIdle_IT(handle, recvbuffer, sizeof(recvbuffer));
 }
 
+void cpptest(void);
+
 int main() {
 
 	uart_init();
+	cpptest();
 	while (1);
 
 }

@@ -6,6 +6,7 @@ LDSCRIPT=link.ld
 LDFLAGS +=  -L$(UCDEV_ROOT)/lib/arm_m3/size -l hal_stm32f103xb
 
 C_SOURCES+=main.c
+CXX_SOURCES += test.cpp
 
 C_SOURCES+=$(UCDEV_ROOT)/startup/startup_cortexm.c
 C_INCLUDES+=$(UCDEV_ROOT)/startup

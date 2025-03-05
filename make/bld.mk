@@ -53,8 +53,12 @@ ifeq ($(COMPILER_TYPE),gcc)
 endif
 
 # list of objects
-OBJECTS = $(addprefix $(BUILD_DIR)/,$(notdir $(C_SOURCES:.c=.c$(OBJ_SUFFIX))))
+OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(C_SOURCES:.c=.c$(OBJ_SUFFIX))))
 vpath %.c $(sort $(dir $(C_SOURCES)))
+
+OBJECTS += $(addprefix $(BUILD_DIR)/,$(notdir $(CXX_SOURCES:.cpp=.cpp$(OBJ_SUFFIX))))
+vpath %.cpp $(sort $(dir $(CXX_SOURCES)))
+
 
 # list of ASM program objects
 # Handle both .s (eg STM32Cube) and .S (eg nrfx) asm files 
@@ -82,9 +86,9 @@ clean:
 
 $(BUILD_DIR)/%.c.o: %.c Makefile | $(BUILD_DIR) 
 	$(CC) -c $(CFLAGS) $< -o $@
-# Disabled the generation of assembly listing as this triggers a gcc bug
-# causing corrupted DWARF debug data when building for RISCV
-#	$(CC) -c $(CFLAGS) -Wa,-a,-ad,-alms=$(BUILD_DIR)/$(notdir $(<:.c=.lst)) $< -o $@
+
+$(BUILD_DIR)/%.cpp.o: %.cpp Makefile | $(BUILD_DIR) 
+	$(CXX) -c $(CXXFLAGS) $< -o $@
 
 $(BUILD_DIR)/%.s.o: %.s Makefile | $(BUILD_DIR)
 	$(AS) -c $(ASFLAGS) $< -o $@
