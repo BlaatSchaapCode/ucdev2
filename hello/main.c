@@ -6,10 +6,7 @@
 #include <stm32f1xx.h>
 #include <stm32f1xx_hal.h>
 
-
-//  TODO: this must move to some system support file for stm32f1
-const uint8_t APBPrescTable[8U] =  {0, 0, 0, 0, 1, 2, 3, 4};
-uint32_t SystemCoreClock = 8000000;
+#include <clocksetup.h>
 
 
 
@@ -56,6 +53,13 @@ void uart_init() {
 	NVIC_EnableIRQ(USART2_IRQn);
 	HAL_UART_RegisterRxEventCallback(handle,RxEventCallback);
 	HAL_UARTEx_ReceiveToIdle_IT(handle, recvbuffer, sizeof(recvbuffer));
+}
+
+
+
+
+[[gnu::constructor(101)]] void ClockSetup(void) {
+	ClockSetup_HSE8_SYS72();
 }
 
 void cpptest(void);

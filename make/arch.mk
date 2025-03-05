@@ -5,8 +5,11 @@
 ifeq ($(ARCH), arm)
 	COMPILER_TYPE?=gcc
 	PREFIX?=arm-none-eabi-
+	C_SOURCES+=$(UCDEV_ROOT)/startup/startup_cortexm.c
+	C_INCLUDES+=$(UCDEV_ROOT)/startup	
 	SPECS ?=  --specs=nosys.specs  --specs=nano.specs 
 	C_INCLUDES +=$(CMSIS_INC_CORE)
+	
 
 	ifeq ($(SUBARCH), m0)
 			CPU?=	-mcpu=cortex-m0
@@ -188,6 +191,7 @@ ifeq ($(COMPILER_TYPE),gcc)
 
 	# Generate dependency information
 	CFLAGS +=  -MMD -MP -MF"$(@:%.o=%.d)"
+	CXXFLAGS +=  -MMD -MP -MF"$(@:%.o=%.d)"
 	ASFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
 endif
 
@@ -198,7 +202,7 @@ $(info Architecture  $(ARCH))
 $(info Subarch       $(SUBARCH))
 $(info Compile type  $(COMPILER_TYPE))
 
-$(info CC           $(CC))
+$(info CC            $(CC))
 
 $(info CPU           $(CPU))
 $(info FPU           $(FPU))

@@ -19,10 +19,12 @@ ifeq ($(FAMILY), STM32)
 	ifneq (,$(findstring F1,$(MCU)))
 		SUBARCH?=m3
 		SERIES?=STM32F1
-		C_INCLUDES +=$(CUBEF1_HAL_INC_ROOT)
-		C_INCLUDES +=$(CUBEF1_CMSIS_INC_DEV)
-		C_DEFS += -DSYSTEMINCLUDE=\<stm32f1xx.h\>
-		C_DEFS += -DIRQ_COUNT=64
+		C_INCLUDES += $(CUBEF1_HAL_INC_ROOT)
+		C_INCLUDES += $(CUBEF1_CMSIS_INC_DEV)
+		C_INCLUDES += $(UCDEV_ROOT)/platform/stm32/f1
+		C_SOURCES  += $(UCDEV_ROOT)/platform/stm32/f1/clocksetup.c
+		C_DEFS     += -DSYSTEMINCLUDE=\<stm32f1xx.h\>
+		C_DEFS     += -DIRQ_COUNT=64
 	endif
 endif
 
