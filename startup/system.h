@@ -1,5 +1,9 @@
 #pragma once
 
+#ifdef SYSTEMINCLUDE
+#include SYSTEMINCLUDE
+#else
+
 #ifndef __NVIC_PRIO_BITS
 #define __NVIC_PRIO_BITS 4U
 #endif 
@@ -8,7 +12,7 @@
 #define IRQ_COUNT 64
 #endif 
 
-typedef int IRQn_Type;
+#define IRQn_Type int
 #define SysTick_IRQn -1
 
 #if defined(__ARM_ARCH_6M__)
@@ -25,6 +29,11 @@ typedef int IRQn_Type;
 #include "core_cm55.h"
 #else
 #error "Unsupported Cortex-M variant!"
+#endif
+
+#undef IRQn_Type
+#undef SysTick_IRQn
+
 #endif
 
 //int mcu_irq_count() { return 32 * (1 + SCnSCB->ICTR); }

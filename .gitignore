@@ -1,0 +1,4 @@
+build
+lib
+hello/.*
+hello/debug

@@ -1,17 +1,13 @@
 
 ifeq ($(BUILD_LIBRARY),1)
-OUT_DIR     =   $(shell echo $(BUILD_MODE) | tr A-Z a-z)/$(shell echo $(ARCH) | tr A-Z a-z)_$(shell echo $(SUBARCH) | tr A-Z a-z)
-BUILD_DIR 	= 	$(OUT_DIR)/build
+#OUT_DIR     =   $(shell echo $(BUILD_MODE) | tr A-Z a-z)/$(shell echo $(ARCH) | tr A-Z a-z)_$(shell echo $(SUBARCH) | tr A-Z a-z)
+OUT_DIR     =   $(UCDEV_ROOT)/lib/$(shell echo $(ARCH) | tr A-Z a-z)_$(shell echo $(SUBARCH) | tr A-Z a-z)/$(shell echo $(BUILD_MODE) | tr A-Z a-z)/
+BUILD_DIR 	= 	$(UCDEV_ROOT)/build/$(shell echo $(ARCH) | tr A-Z a-z)_$(shell echo $(SUBARCH) | tr A-Z a-z)/$(shell echo $(BUILD_MODE) | tr A-Z a-z)/
 else 
-ifeq ($(BUILD_SYSTEM_LIBRARY),1)
-OUT_DIR     =   $(shell echo $(BUILD_MODE) | tr A-Z a-z)
-BUILD_DIR   =   $(OUT_DIR)/$(shell echo $(MCU) | tr A-Z a-z)/build
-BUILD_LIBRARY=1
-else
 OUT_DIR     =   $(shell echo $(BUILD_MODE) | tr A-Z a-z)/$(shell echo $(MCU) | tr A-Z a-z)
 BUILD_DIR   =   $(OUT_DIR)/build
 endif
-endif
+
 
 
 
