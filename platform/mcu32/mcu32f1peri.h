@@ -114,7 +114,7 @@
 //#define FSMC_BANK2_3_R_BASE   (FSMC_R_BASE + 0x00000060UL)    /*!< FSMC Bank2/Bank3 registers base address */
 //#define FSMC_BANK4_R_BASE     (FSMC_R_BASE + 0x000000A0UL)    /*!< FSMC Bank4 registers base address */
 //
-//#define DBGMCU_BASE          0xE0042000UL /*!< Debug MCU registers base address */
+#define DBGMCU_BASE          0xE0042000UL /*!< Debug MCU registers base address */
 
 /* USB device FS */
 

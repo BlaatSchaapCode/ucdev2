@@ -27,6 +27,27 @@
 #ifndef LIBHALGLUE_COMMON_ARM_CPUID_H_
 #define LIBHALGLUE_COMMON_ARM_CPUID_H_
 
+#include <stdint.h>
+
+#define CM3P1P1  0x411fc231
+
+// Vendor ID is set to ARM, who made the core,
+// rather then who made the MCU
+#define VENDOR_ARM 0x143b
+
+
+#define VENDOR_ST 0x1020
+#define VENDOR_GD 0x1751
+#define VENDOR_HK 0x0555
+
+
+// Vendors that have no JEP106 ID
+
+#define VENDOR_MH  0xF000
+#define VENDOR_CH  0xF001
+#define VENDOR_APM 0xF002 // ApexMic branded APM32
+#define VENDOR_GH  0xF003 // Geehy branded APM32
+
 // This is the ROM TABLE as defined in the Cortex-M reference manual
 // Please note a non conforming implementation might differ from this
 // but still be a valid ROM TABLE when being parsed as being a ROM TABLE.

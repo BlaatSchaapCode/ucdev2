@@ -3,6 +3,7 @@ MCU = MCU32F1
 LDSCRIPT=link.ld
 
 C_SOURCES   += main.c
+C_SOURCES   += identify.c
 CXX_SOURCES += test.cpp
 
 
