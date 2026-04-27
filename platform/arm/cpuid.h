@@ -148,6 +148,10 @@ typedef struct {
 	union {
 		uint64_t pid;
 		struct {
+			uint32_t word_l;
+			uint32_t word_h;
+		};
+		struct {
 			unsigned int partno :12;
 			unsigned int identity_code :7;
 			unsigned int jep106_used :1;

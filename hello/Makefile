@@ -15,8 +15,15 @@ C_SOURCES+=$(UCDEV_ROOT)/platform/mcu32/mcu32f1flash.c
 C_INCLUDES+=$(UCDEV_ROOT)/platform/mcu32/
 
 
-C_SOURCES+=$(UCDEV_ROOT)/os/os_nosys.c
-C_INCLUDES+=$(UCDEV_ROOT)/os
+C_INCLUDES+=$(UCDEV_ROOT)/ext/RTT/Config
+C_INCLUDES+=$(UCDEV_ROOT)/ext/RTT/RTT
+C_SOURCES+=$(UCDEV_ROOT)/ext/RTT/RTT/SEGGER_RTT.c
+C_SOURCES+=$(UCDEV_ROOT)/ext/RTT/Syscalls/SEGGER_RTT_Syscalls_GCC.c
+
+
+
+# C_SOURCES+=$(UCDEV_ROOT)/os/os_nosys.c
+# C_INCLUDES+=$(UCDEV_ROOT)/os
 
 UCDEV_ROOT=..
 include $(UCDEV_ROOT)/make/all.mk

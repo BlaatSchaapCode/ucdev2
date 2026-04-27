@@ -21,12 +21,14 @@ void rtc_init(void) {
 	// at this time. Just to get the RTC going.
 	(*(uint32_t*)PWR_BASE) |= 1 << 8;
 
-	//rcc->cs.lsi_on = 1;
-	//while (!rcc->cs.lsi_rdy);
+//	rcc->cs.lsi_on = 1;
+//	while (!rcc->cs.lsi_rdy);
+//	rcc->bdc.rtc_sel = 0b10; // LSI, TODO enum
+
 	rcc->bdc.lse_on = 1;
 	while (!rcc->bdc.lse_rdy);
-	//rcc->bdc.rtc_sel = 0b10; // LSI, TODO enum
 	rcc->bdc.rtc_sel = 0b01; // LSE, TODO enum
+
 	rcc->bdc.rtc_en = 1;
 }
 

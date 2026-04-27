@@ -51,16 +51,17 @@ typedef enum {
 } mcu32f1_rcc_system_clock_t;
 
 typedef enum {
-	clock_out_none   = 0b000, //
+	clock_out_none = 0b000, //
 	clock_out_sysclk = 0b0100, //
-	clock_out_hsi    = 0b0101, //
-	clock_out_hse    = 0b0110, //
+	clock_out_hsi = 0b0101, //
+	clock_out_hse = 0b0110, //
 	clock_out_pll1_div2 = 0b0111, //
 	clock_out_pll2 = 0b1000, //
 	clock_out_pll3_div2 = 0b1001, //
 	clock_out_xt1 = 0b1010, //
 	clock_out_pll3 = 0b1011, //
-} mcu32f1_rcc_clock_out_t;;
+} mcu32f1_rcc_clock_out_t;
+;
 
 typedef union {
 	uint32_t word;
@@ -71,16 +72,25 @@ typedef union {
 		unsigned apb1_prescaler :3;   // 8..10
 		unsigned apb2_prescaler :3;   // 11..13
 		unsigned adc_prescaler :2;   // 14..15
-		unsigned pll_source :1;   // 16
+		unsigned pll_source :1;   // 16 0 = HSI/2, 1 = HSE/PREDIV1 // TODO enum
 		unsigned prediv1_0 :1; // 17: cfg2 prediv1 bit 0 where it is implemented
 		unsigned pll1_mul :4;   // 18..21 // differs between {1,2,3} and {5,7}?
 		unsigned usbpre :2;   // 22..23 GD32F1
 		mcu32f1_rcc_clock_out_t clock_output :4;   // 24..27
 
 		// GD32 speed extensions: todo check other brands
-		unsigned gd32_adc_prescaler_2 :1; // 28 gd32f1: adc_prescaler[2]; // mh32:  pllmul[4]
-		unsigned gd32_pll_mul_4 :1; // 29 gd32f1: pllmul[4];
+
 	};
+	struct {
+		unsigned :28;
+		unsigned adc_prescaler_2 :1; // 28 gd32f1: adc_prescaler[2]; // mh32:  pllmul[4]
+		unsigned pll_mul_4 :1; // 29 gd32f1: pllmul[4];
+	} gd32;
+	struct {
+		unsigned :28;
+		unsigned pll_mul_4 :1; // 28: mh32 pllmul[4], needs unlocking first
+	} mh32;
+
 } mcu32f1_rcc_cfg1_t;
 
 typedef union {
@@ -332,12 +342,12 @@ typedef union {
 typedef union {
 	volatile uint32_t word;
 	struct {
-		unsigned second : 1;
-		unsigned alarm : 1;
-		unsigned overflow : 1;
-		unsigned synchronised : 1;
-		unsigned configuration : 1;
-		unsigned ready : 1;
+		unsigned second :1;
+		unsigned alarm :1;
+		unsigned overflow :1;
+		unsigned synchronised :1;
+		unsigned configuration :1;
+		unsigned ready :1;
 	};
 } mcu32f1_rtc_if;
 
@@ -345,13 +355,12 @@ typedef union {
 	volatile uint32_t word_hi;
 	volatile uint32_t word_lo;
 	struct {
-		volatile unsigned hi : 16;
-		volatile unsigned : 16; // padding
-		volatile unsigned lo : 16;
-		volatile unsigned : 16; // padding
+		volatile unsigned hi :16;
+		volatile unsigned :16; // padding
+		volatile unsigned lo :16;
+		volatile unsigned :16; // padding
 	};
 } mcu32f1_rtc_val;
-
 
 typedef struct {
 	volatile mcu32f1_rtc_if interrupt;
@@ -363,7 +372,6 @@ typedef struct {
 } mcu32f1_rtc_t;
 
 //---------------------------------------------------------------------------
-
 
 #pragma pack(pop)
 
