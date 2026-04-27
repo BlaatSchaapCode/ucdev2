@@ -28,6 +28,19 @@ ifeq ($(FAMILY), STM32)
 	endif
 endif
 
+ifneq (,$(findstring MCU32,$(MCU)))
+	FAMILY?=MCU32
+	C_INCLUDES += $(UCDEV_ROOT)/platform/mcu32
+	ARCH?=arm
+
+	ifneq (,$(findstring F1,$(MCU)))
+		SUBARCH?=m3
+		SERIES?=MCU32F1
+		C_DEFS     += -DIRQ_COUNT=64
+	endif
+endif
+
+
 
 ifdef MCU
 C_DEFS += -D$(MCU)
