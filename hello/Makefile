@@ -5,6 +5,7 @@ LDSCRIPT=link.ld
 C_SOURCES   += main.c
 C_SOURCES   += identify.c
 CXX_SOURCES += test.cpp
+ASM_SOURCES += test.s
 
 
 C_SOURCES+=$(UCDEV_ROOT)/platform/arm/cpuid.c

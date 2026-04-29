@@ -13,6 +13,8 @@
 //#include "identify.h"
 int identify(void); // TODO
 
+#define _2514_SysFreq_Set   (*((void (*)(uint32_t pllsrc, uint32_t pllmul, uint32_t latency))(*(uint32_t *)0x1FFFD014)))
+
 [[gnu::alias("USART2_IRQHandler")]] void Interrupt38_Handler(void) [[gnu::unused]];
 [[gnu::interrupt]] void USART2_IRQHandler(void) {
 }
@@ -131,7 +133,8 @@ uint32_t rcc_get_sysclk(void) {
 			}
 		}
 		int pllmul = rcc->cfg1.pll1_mul + 2;
-		if (pllmul == 17) pllmul = 16;
+		if (pllmul == 17)
+			pllmul = 16;
 
 		return pll_in * pllmul;
 
@@ -144,6 +147,13 @@ uint32_t rcc_get_sysclk(void) {
 }
 
 int main() {
+
+//	extern void System_UnlockAir();
+//	System_UnlockAir();
+//
+	extern void System_Unlock2514();
+	System_Unlock2514();
+
 	puts("--------------------");
 	romtable_pid_t rt_pid = get_romtable_pid();
 
@@ -155,10 +165,46 @@ int main() {
 
 	rtc_init();
 
-	volatile mcu32f1_rcc_t *rcc = (volatile mcu32f1_rcc_t*) RCC_BASE;
-
 	peripheral_enable((void*) FMC_BASE);
 // First test on HSI
+
+	volatile mcu32f1_rcc_t *rcc = (volatile mcu32f1_rcc_t*) RCC_BASE;
+
+	// Select HSI as System Clock
+	rcc->cfg1.system_clock_select = system_clock_hsi;
+	// Disable PLL
+	rcc->cr.pllon = 0;
+
+	rcc->cr.hseon = 1;
+	while (!rcc->cr.hserdy)
+		;
+	rcc->cfg1.pll_source = 1; // TODO enum
+
+	(*(uint32_t*) (0x40022214)) |= 1;
+	for (int i = 0b0000; i <= 0b11111; i++) {
+
+		// Select HSI as System Clock
+		rcc->cfg1.system_clock_select = system_clock_hsi;
+		// Disable PLL
+		rcc->cr.pllon = 0;
+
+		uint32_t pllmul_mh = ((i & 0b1111) << 18) | ((i & 0b10000) << (28 - 5));
+		// TODO: Disassemble the ROM Set Freq to see what is happening
+		_2514_SysFreq_Set(system_clock_hsi, pllmul_mh, ((i + 2) * 8) / 24);
+		//rcc->cfg1.pll1_mul = i;
+		//rcc->cfg1.mh32.pll_mul_4 = i >> 4;
+
+		rcc->cr.pllon = 1;
+		while (!rcc->cr.pllrdy)
+			;
+		// Set clock source to PLL
+		rcc->cfg1.system_clock_select = system_clock_pll;
+
+		printf(
+				"2514 PLL Source: HSI/2: PLL Multiplier reg val %X Calculated speed: %9d",
+				i, rcc_get_sysclk() / 1000000);
+		measure_speed_mhz();
+	}
 
 	for (int i = 0b0000; i <= 0b1111; i++) {
 		// Select HSI as System Clock
@@ -173,7 +219,8 @@ int main() {
 		flash_set_latency(((i + 2) * 8) / 24);
 		// Enable PLL
 		rcc->cr.pllon = 1;
-		while (!rcc->cr.pllrdy);
+		while (!rcc->cr.pllrdy)
+			;
 		// Set clock source to PLL
 		rcc->cfg1.system_clock_select = system_clock_pll;
 
@@ -183,12 +230,11 @@ int main() {
 		measure_speed_mhz();
 	}
 
-
 	// restore clock state
 	// Select HSI as System Clock
-		rcc->cfg1.system_clock_select = system_clock_hsi;
+	rcc->cfg1.system_clock_select = system_clock_hsi;
 	// Disable PLL
-		rcc->cr.pllon = 0;
+	rcc->cr.pllon = 0;
 
 	rcc->cr.hseon = 1;
 	while (!rcc->cr.hserdy)
