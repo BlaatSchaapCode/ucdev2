@@ -189,9 +189,16 @@ int main() {
 		// TODO: Flash latency setting crashes
 		flash_set_latency(((i + 2) * 8) / 24);
 		// Enable PLL
+
+		// Behaviour MS32F103:
+		// PLL fails to become ready when
+		// clock source is HSI and pll1_mul = 0 (2x)
+		// PLL becomes ready for pll1_mul = 1 (3x) or higher
+		// However, measured speeds are 2/3 or expected value.
+		// On HSE it seems to behave as expected
 		rcc->cr.pllon = 1;
-		while (!rcc->cr.pllrdy)
-			;
+		while (!rcc->cr.pllrdy)	;
+
 		// Set clock source to PLL
 		rcc->cfg1.system_clock_select = system_clock_pll;
 
