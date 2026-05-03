@@ -103,7 +103,7 @@ typedef union {
 		unsigned prediv1_src :1; // 16
 		unsigned i2s2_src :1; // 17
 		unsigned i2s3_src :1; // 18
-	}
+	};
 } mcu32f1_rcc_cfg2_t;
 
 typedef union {
@@ -186,7 +186,7 @@ typedef union {
 		unsigned und29 :1;   // 29
 		unsigned und30 :1;   // 30
 		unsigned und31 :1;   // 31
-	}
+	};
 } mcu32f1_rcc_apb2_t;
 
 typedef union {
@@ -224,7 +224,7 @@ typedef union {
 		unsigned dac1 :1;   // 29
 		unsigned und30 :1;   // 30
 		unsigned und31 :1;   // 31
-	}
+	};
 } mcu32f1_rcc_apb1_t;
 
 typedef union {
@@ -262,7 +262,7 @@ typedef union {
 		unsigned und29 :1;   // 29
 		unsigned und30 :1;   // 30
 		unsigned und31 :1;   // 31
-	}
+	};
 } mcu32f1_rcc_ahb1_t;
 
 typedef union {
@@ -276,7 +276,7 @@ typedef union {
 		unsigned :5;
 		unsigned rtc_en :1;
 		unsigned bd_rst :1;
-	}
+	};
 } mcu32f1_rcc_bdc_t;
 
 typedef union {
@@ -293,7 +293,7 @@ typedef union {
 		unsigned iwdg_rst :1;
 		unsigned wwdg_rst :1;
 		unsigned lpwrrst :1;
-	}
+	};
 } mcu32f1_rcc_cs_t;
 
 typedef struct {

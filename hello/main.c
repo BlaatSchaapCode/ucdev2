@@ -3,6 +3,8 @@
 
 #include <system.h>
 #include <cpuid.h>
+#include "fpu.h"
+#include "identify.h"
 
 #include <mcu32f1peri.h>
 #include <mcu32f1rtc.h>
@@ -12,6 +14,10 @@
 
 //#include "identify.h"
 int identify(void); // TODO
+int identify_system_rom_vt(void); // TODO
+int irq_prio_count(void);
+int get_fpu(void);
+int get_mpu(void);
 
 [[gnu::alias("USART2_IRQHandler")]] void Interrupt38_Handler(void) [[gnu::unused]];
 [[gnu::interrupt]] void USART2_IRQHandler(void) {
@@ -131,7 +137,8 @@ uint32_t rcc_get_sysclk(void) {
 			}
 		}
 		int pllmul = rcc->cfg1.pll1_mul + 2;
-		if (pllmul == 17) pllmul = 16;
+		if (pllmul == 17)
+			pllmul = 16;
 
 		return pll_in * pllmul;
 
@@ -147,12 +154,22 @@ int main() {
 	puts("--------------------");
 	romtable_pid_t rt_pid = get_romtable_pid();
 
-	printf("Core CPU          ID: %08X\n", get_cpuid());
+	printf("Core CPUID          : %08X\n", get_cpuid());
+	printf("Interrupt Prio Count: %d\n", irq_prio_count());
+	printf("FPU Support         : %08X %08X %08X\n", FPU->MVFR0.word,
+				FPU->MVFR1.word, FPU->MVFR2.word); 	// eg. GD32E1
+
+
+
+
 	printf("Romtable          ID: %08X %08X\n", rt_pid.word_h, rt_pid.word_l);
 	printf("Compact Romtable  ID: %08X\n", get_pid32());
-	printf("Debug             ID: %08X\n", *(uint32_t*) DBGMCU_BASE);
-	identify();
-
+	printf("DBGMCU            ID: %08X\n", *(uint32_t*) DBGMCU_BASE);
+	printf("Serial Number       : %08X %08X %08X\n", *(int*) (0x1FFFF7E8),
+			*(int*) (0x1FFFF7EC), *(int*) (0x1FFFF7F0));
+	printf("System ROM VT SUM   : %08X\n", identify_system_rom_vt());
+	printf("Sticky RCC Bits     : %08X %08X %08X\n", sticky_ahb1_bits(), sticky_apb1_bits(), sticky_apb2_bits());
+	printf("Identification      : %08X\n", identify());
 	rtc_init();
 
 	volatile mcu32f1_rcc_t *rcc = (volatile mcu32f1_rcc_t*) RCC_BASE;
@@ -173,7 +190,8 @@ int main() {
 		flash_set_latency(((i + 2) * 8) / 24);
 		// Enable PLL
 		rcc->cr.pllon = 1;
-		while (!rcc->cr.pllrdy);
+		while (!rcc->cr.pllrdy)
+			;
 		// Set clock source to PLL
 		rcc->cfg1.system_clock_select = system_clock_pll;
 
@@ -183,12 +201,11 @@ int main() {
 		measure_speed_mhz();
 	}
 
-
 	// restore clock state
 	// Select HSI as System Clock
-		rcc->cfg1.system_clock_select = system_clock_hsi;
+	rcc->cfg1.system_clock_select = system_clock_hsi;
 	// Disable PLL
-		rcc->cr.pllon = 0;
+	rcc->cr.pllon = 0;
 
 	rcc->cr.hseon = 1;
 	while (!rcc->cr.hserdy)

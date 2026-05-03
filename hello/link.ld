@@ -16,7 +16,8 @@ __ROM_SIZE = 128k;
  -----------------------------------------------------------------------------*/
 __RAM_BASE = 0x20000000;
 /* __RAM_SIZE = 20k; */
-__RAM_SIZE = 16k;
+/* __RAM_SIZE = 16k; */  /* GD32F101CBT6 */
+__RAM_SIZE = 10k;  /* STM32F103C6T6 /
 
 /*--------------------- Stack / Heap Configuration ----------------------------
   <h> Stack / Heap Configuration

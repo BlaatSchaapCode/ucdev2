@@ -1,6 +1,7 @@
 TARGET  = hello
 MCU = MCU32F1
 LDSCRIPT=link.ld
+#LDSCRIPT=nrf5x.ld
 
 C_SOURCES   += main.c
 C_SOURCES   += identify.c

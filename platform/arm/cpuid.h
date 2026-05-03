@@ -45,8 +45,9 @@
 
 #define VENDOR_MH  0xF000
 #define VENDOR_CH  0xF001
-#define VENDOR_APM 0xF002 // ApexMic branded APM32
+#define VENDOR_APM 0xF002 // ApexMic branded APM32 // TODO: ApexMic JDEC 106 UD
 #define VENDOR_GH  0xF003 // Geehy branded APM32
+#define VENDOR_MM  0xF004 // MindMotion
 
 // This is the ROM TABLE as defined in the Cortex-M reference manual
 // Please note a non conforming implementation might differ from this
