@@ -146,11 +146,14 @@ uint32_t rcc_get_sysclk(void) {
 	return 0;
 }
 
+
+//#define test    (*((void (*)(void))((uint32_t)0x1fffe920)))
+
 int main() {
 
 //	extern void System_UnlockAir();
 //	System_UnlockAir();
-//
+
 	extern void System_Unlock2514();
 	System_Unlock2514();
 
@@ -181,7 +184,7 @@ int main() {
 	rcc->cfg1.pll_source = 1; // TODO enum
 
 	(*(uint32_t*) (0x40022214)) |= 1;
-	for (int i = 0b0000; i <= 0b11111; i++) {
+	for (int i = 0b1111; i <= 0b11111; i++) {
 
 		// Select HSI as System Clock
 		rcc->cfg1.system_clock_select = system_clock_hsi;
@@ -189,10 +192,15 @@ int main() {
 		rcc->cr.pllon = 0;
 
 		uint32_t pllmul_mh = ((i & 0b1111) << 18) | ((i & 0b10000) << (28 - 5));
-		// TODO: Disassemble the ROM Set Freq to see what is happening
-		_2514_SysFreq_Set(system_clock_hsi, pllmul_mh, ((i + 2) * 8) / 24);
-		//rcc->cfg1.pll1_mul = i;
-		//rcc->cfg1.mh32.pll_mul_4 = i >> 4;
+//		// TODO: Disassemble the ROM Set Freq to see what is happening
+//		_2514_SysFreq_Set(system_clock_hsi, pllmul_mh, ((i + 2) * 8) / 24);
+
+		rcc->cfg1.pll1_mul = i;
+//		rcc->cfg1.mh32.pll_mul_4 = i >> 4;
+		rcc->cfg1._2514.pll_mul_4 = i >> 4;
+
+		flash_set_latency(((i + 2) * 8) / 24);
+
 
 		rcc->cr.pllon = 1;
 		while (!rcc->cr.pllrdy)

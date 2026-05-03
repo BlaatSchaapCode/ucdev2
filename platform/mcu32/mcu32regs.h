@@ -91,6 +91,11 @@ typedef union {
 		unsigned pll_mul_4 :1; // 28: mh32 pllmul[4], needs unlocking first
 	} mh32;
 
+	struct {
+		unsigned :27;
+		unsigned pll_mul_4 :1; // 27: 2514 pllmul[4], needs unlocking first
+	} _2514;
+
 } mcu32f1_rcc_cfg1_t;
 
 typedef union {
