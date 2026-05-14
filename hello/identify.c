@@ -12,6 +12,11 @@
 #include "mcu32regs.h"
 #include "mcu32f1peri.h"
 
+//----------------------------------------
+int try_read32(void *addr, uint32_t *val);
+int try_write32(void *addr, uint32_t val);
+//----------------------------------------
+
 uint32_t sticky_ahb1_bits(void) {
 	volatile mcu32f1_rcc_t *rcc = (volatile mcu32f1_rcc_t*) RCC_BASE;
 	uint32_t initial_value = rcc->ahb1_enable.word;
@@ -44,8 +49,43 @@ int identify_system_rom_vt(void) {
 	// This contains some built-in uart bootloader
 	// This code tried to identify it by calculating
 	// a checksum of the vector table
-
+	uint32_t value;
 	uint32_t checksum = 0;
+
+	// Some devices place the boot rom at a different location
+	// Accessing these addresses that may not be defined could
+	// cause a hardfault. We have the try_read() function to
+	// handle these cases.
+
+	// on STM32F10{5,7} the system rom appears to start at 0x1FFFB000
+	// on MH32F103 the system rom appears to start at      0x1FFFB000
+	// on the FCM32F103 the system rom start at            0x1FFFE000
+
+	// RX32F103: reading from system memory, supposidly at 0x1FFFF000
+	// returns non-constant data. Seems to apply to the whole space
+
+	// Note the MH2514 also has a valid vector table at 0x1FFFF000
+	// as well as at 0x1FFFB000. Sp, we check for the 0x1FFFB000 one first.
+
+	if (!try_read32((void*) 0x1FFFB000, &value)) {
+		// Succeeded to read from 0x1FFFB000
+		if (((*(uint32_t*) 0x1FFFB000) & 0xF0000000) == 0x20000000) {
+			for (uint32_t *system_rom = (uint32_t*) 0x1FFFB000;
+					system_rom < (uint32_t*) 0x1FFFB020; system_rom++)
+				checksum += *system_rom;
+			return checksum;
+		}
+	}
+
+	if (!try_read32((void*) 0x1FFFE000, &value)) {
+		// Succeeded to read from 0x1FFFE000
+		if (((*(uint32_t*) 0x1FFFE000) & 0xF0000000) == 0x20000000) {
+			for (uint32_t *system_rom = (uint32_t*) 0x1FFFE000;
+					system_rom < (uint32_t*) 0x1FFFE020; system_rom++)
+				checksum += *system_rom;
+			return checksum;
+		}
+	}
 
 	if (((*(uint32_t*) 0x1FFFF000) & 0xF0000000) == 0x20000000) {
 		// There appears to be a valid vector table at 0x1FFFF000
@@ -59,26 +99,17 @@ int identify_system_rom_vt(void) {
 		for (uint32_t *system_rom = (uint32_t*) 0x1FFFF000;
 				system_rom < (uint32_t*) 0x1FFFF020; system_rom++)
 			checksum += *system_rom;
+		return checksum;
 
 	} else if (((*(uint32_t*) 0x1FFFF400) & 0xF0000000) == 0x20000000) {
 		// There appears to be a valid vector table at 0x1FFFF400
-		// This is observed on for example the MM32F103
+		// This is observed on the MM32F103, BLM32F103
 
 		for (uint32_t *system_rom = (uint32_t*) 0x1FFFF400;
 				system_rom < (uint32_t*) 0x1FFFF420; system_rom++)
 			checksum += *system_rom;
+		return checksum;
 	}
-
-	// Some devices place the boot rom at a different location
-	// We might need to get the try hardfault memory access code
-	// into the project to probe memory addresses that potentially
-	// cause an memfault/hardfault.
-
-	// on STM32F10{5,7} the system rom appears to start at 0x1FFFB000
-
-	// on MH32F103 the system rom appears to start at 0x1FFFB000
-
-	// on the FCM32F103 the system rom start at 0x1FFFE000
 
 	return checksum;
 }
@@ -135,18 +166,45 @@ int identify(void) {
 		// An all-zero romtable has been observed on MegaHunt devices
 		// Documentation specifies an identification method my matching
 		// the first 28 bit of the serial number.
+		// Another thing we could look at is the fact it only has 8
+		// interrupt priorities in stead of 16.
+		// For now identify by system rom vector table checksum.
+		switch (identify_system_rom_vt()) {
+		// Looking at the System ROM
+		case ID_BOOTROM_VT_MH2103:
+			return VENDOR_MH << 16 | 0x2103;
+		case ID_BOOTROM_VT_BLM32:
+			// BetterLife (https://blestech.com/en/)
+			return VENDOR_BLM << 16;
+			break;
+		default:
+			break;
+		}
+
 		break;
 	case VENDOR_ARM:
 		// Generic ARM Romtable
 		// ROMTABLE does not specify MCU vendor,
 		switch (identify_system_rom_vt()) {
 		// Looking at the System ROM
-		case ID_BOOTROM_VT_STM32F1:
+		case ID_BOOTROM_VT_STM32F103:
 			// A copy of ST's Bootrom
 
-			if (0x0CF300FF == (*(int32_t*) (0x1FFFF7d0))) {
+			switch ((*(uint32_t*) (0x1FFFF7d0))) {
+			case 0x0CF300FF:
+				// 0x0CF300FF is at this location for both ApexMic and Geehy
+				// branded APM32F103. This seems an identifying factor.
 				// ApexMic branded APM32
-				return VENDOR_APM << 16;
+				//return VENDOR_APM << 16;
+				return VENDOR_GH << 16;
+			case 0xFFFFFFFF:
+				// Possibly CSK32F103? or MS32F103?
+				// Can we tell them apart?
+				// These features are too generic to tell.
+				// TODO: other things to detect?
+				return VENDOR_CETC << 16;
+			default:
+				break;
 			}
 
 			break;
@@ -161,6 +219,20 @@ int identify(void) {
 		case ID_BOOTROM_VT_MM32F1:
 			// MindMotion MM32F103
 			return VENDOR_MM << 16;
+		case ID_BOOTROM_VT_AT32F4: {
+			uint32_t dbgmcu = *(uint32_t*) DBGMCU_BASE;
+			uint8_t artery1 = (dbgmcu >> 28) & 0xF;
+			uint8_t artery2 = (dbgmcu >> 16) & 0xF;
+			switch (artery1) {
+			case 5:
+			case 7:
+				return VENDOR_AT << 16 | artery1 << 12 | artery2 << 8;
+			default:
+				break;
+			}
+
+			break;
+		}
 		default:
 			break;
 		}
@@ -173,12 +245,23 @@ int identify(void) {
 	case VENDOR_GD:
 		return vendor_id << 16 | pid.partno;
 	case VENDOR_ST:
-		if (get_cpuid().cpuid == CM3P1P1) {
+		switch (get_cpuid().cpuid)
+		case CM3R1P1:
 			// Original STM32F1 uses Cortex M3 r1p1
 			// All known clones use later revisions of
 			// the CM3 core.
+			// TODO: tell the dies apart.
 			return vendor_id << 16 | pid.partno;
+	case CM3R2P0:
+		// Potentially MH2514
+		switch (identify_system_rom_vt()) {
+		case ID_BOOTROM_VT_MH2514:
+			return VENDOR_MH << 16 | 0x2514;
+			break;
+		default:
+			break;
 		}
+
 		break;
 
 	default:

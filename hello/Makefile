@@ -8,12 +8,15 @@ C_SOURCES   += identify.c
 CXX_SOURCES += test.cpp
 
 
+ASM_SOURCES   += hardfault.S
+
 C_SOURCES+=$(UCDEV_ROOT)/platform/arm/cpuid.c
 C_INCLUDES+=$(UCDEV_ROOT)/platform/arm/
 
-C_SOURCES+=$(UCDEV_ROOT)/platform/mcu32/mcu32f1rtc.c
+C_SOURCES+=$(UCDEV_ROOT)/platform/mcu32/mcu32rtcv1.c
 C_SOURCES+=$(UCDEV_ROOT)/platform/mcu32/mcu32f1peri.c
 C_SOURCES+=$(UCDEV_ROOT)/platform/mcu32/mcu32f1flash.c
+C_SOURCES+=$(UCDEV_ROOT)/platform/mcu32/mcu32f1rcc.c
 C_INCLUDES+=$(UCDEV_ROOT)/platform/mcu32/
 
 

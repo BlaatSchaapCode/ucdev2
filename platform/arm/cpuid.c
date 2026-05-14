@@ -32,6 +32,11 @@ cpuid_t get_cpuid(void) {
     return *(cpuid_t*) (&SCB->CPUID);
 }
 
+
+cortex_m_romtable_t* get_romtable(void) {
+	return (cortex_m_romtable_t*)(0xE00FF000);
+}
+
 romtable_pid_t get_romtable_pid(void) {
 	romtable_id_t *rid = (romtable_id_t*) 0xE00FFFD0;
 	return (romtable_pid_t ) { .pid = rid->pid0 << 0 | rid->pid1 << 8

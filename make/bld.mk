@@ -94,7 +94,7 @@ $(BUILD_DIR)/%.s.o: %.s Makefile | $(BUILD_DIR)
 	$(AS) -c $(ASFLAGS) $< -o $@
 
 $(BUILD_DIR)/%.S.o: %.S Makefile | $(BUILD_DIR)
-	$(AS) -c $(ASFLAGS) $< -o $@
+	$(CC) -c $(ASFLAGS) $< -o $@
 
 ifeq ($(COMPILER_TYPE),gcc)
 $(OUT_DIR)/%.hex: $(OUT_DIR)/%.elf | $(OUT_DIR)
