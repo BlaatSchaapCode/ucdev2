@@ -76,9 +76,12 @@ typedef union {
 		unsigned prediv1_0 :1; // 17: cfg2 prediv1 bit 0 where it is implemented
 		unsigned pll1_mul :4;   // 18..21 // differs between {1,2,3} and {5,7}?
 		unsigned usbpre :2;   // 22..23 GD32F1
+
+		// TODO: conflict with mh2514
+		// Note: bit 27 is only used on Connectivity line F10{5,7}
 		mcu32f1_rcc_clock_out_t clock_output :4;   // 24..27
 
-		// GD32 speed extensions: todo check other brands
+		// TODO: check other brands and models
 
 	};
 	struct {
@@ -89,12 +92,12 @@ typedef union {
 	struct {
 		unsigned :28;
 		unsigned pll_mul_4 :1; // 28: mh32 pllmul[4], needs unlocking first
-	} mh32;
+	} mh2103;
 
 	struct {
 		unsigned :27;
 		unsigned pll_mul_4 :1; // 27: 2514 pllmul[4], needs unlocking first
-	} _2514;
+	} mh2514;
 
 } mcu32f1_rcc_cfg1_t;
 
