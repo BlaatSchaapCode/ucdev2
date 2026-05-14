@@ -29,31 +29,96 @@
 
 #include <stdint.h>
 
-#define CM3P1P1  0x411fc231
+#define CM3R1P1  0x411fc231
+#define CM3R2P0  0x412fc230
 
 // Vendor ID is set to ARM, who made the core,
 // rather then who made the MCU
 #define VENDOR_ARM 0x143b
 
+// On the HK32F103 an invalid entry in romtable has been observed.
+// The bit JEP106 used is not set and the PartNo is set to 0x55
+// and the continuation code set to 0x5
+// However, Shenzhen Hangshun Chip Technology does have a JEP106 ID
+// So we'll be using that instead
+#define VENDOR_HK_RT 0x0555
+#define VENDOR_HK 0x1B68 // Shenzhen Hangshun Chip Technology
 
 #define VENDOR_ST 0x1020
-#define VENDOR_GD 0x1751
-#define VENDOR_HK 0x0555
+#define VENDOR_GD 0x1751 // GigaDevice
 
+// Continuation code 11, entry 0x23 : Apex Microelectronics Co Ltd
+// Since Apex changed name to Geehy, we will use this code for Geehy
+#define VENDOR_GH 0x1B23
 
+#define VENDOR_PY 0x1905 // PUYA
+
+#define VENDOR_AT 0x193B // Artery
+
+//---------------------------------------------------------------------------
 // Vendors that have no JEP106 ID
+//---------------------------------------------------------------------------
 
+
+//---------------------------------------------------------------------------
+// Megahunt. MEGAHUNT Microelectronics  (https://megahuntmicro.com/)
+// Megahunt mentions the WIZnet W55MH32 uses their core.
+// Beijing Hongli Kunpeng International Trade Co., Ltd.
+// (https://www.hlkpint.com) also appears to be using Megahunt cores
+// as their datasheets contain a disclaimer mentioning Mehahunt.
+// The AIR32F103 appears to be the same chip. (https://wiki.luatos.org/)
+// This makes Megahunt seem to produce cores for different brands.
+// Not able to find a matching name in JEP106
 #define VENDOR_MH  0xF000
+//---------------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------------
+// WinChipHead, officially Nanjing Qinheng Microelectronics Co., Ltd.
+// Not able to find a matching name in JEP106
 #define VENDOR_CH  0xF001
-#define VENDOR_APM 0xF002 // ApexMic branded APM32
-#define VENDOR_GH  0xF003 // Geehy branded APM32
+//---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
+// MindMotion, officially Shanghai MindMotion Microelectronics Co., Ltd.
+// Not able to find a matching name in JEP106
+#define VENDOR_MM  0xF004 // MindMotion
+//---------------------------------------------------------------------------
+
+//---------------------------------------------------------------------------
+// WHXY, officially Wuhan Xinyuan Semiconductor Co., Ltd.
+// Not able to find a matching name in JEP106
+#define VENDOR_CW 0xF005 // WHZY
+//---------------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------------
+// China Key System Co., Ltd. (CKS)
+// China Electronics Technology Group Corporation (CETC)
+// lcsc.com sells the part, mentions CKS as manufacturer,
+//          but shows the CETC logo. How are they related?
+// Not able to find a matching name in JEP106
+#define VENDOR_CETC 0xF006 // CKS
+//---------------------------------------------------------------------------
+
+
+//---------------------------------------------------------------------------
+// Shenzhen Betterlife Electronic Science and Technology Co.,Ltd (Blestech)
+// Not able to find a matching name in JEP106
+#define VENDOR_BLM 0xF007 // Blestech
+//---------------------------------------------------------------------------
+// ApexMic does have an entry, using that for both
+//#define VENDOR_APM 0xF002 // ApexMic branded APM32 // TODO: ApexMic JDEC 106 ID
+//#define VENDOR_GH  0xF003 // Geehy branded APM32
+
+
 
 // This is the ROM TABLE as defined in the Cortex-M reference manual
 // Please note a non conforming implementation might differ from this
 // but still be a valid ROM TABLE when being parsed as being a ROM TABLE.
 // Meaning, this expect the entry for these components at this location
 typedef struct {
-	uint32_t nvic;
+	uint32_t scs;
 	uint32_t dwt;
 	uint32_t fpb;
 	uint32_t itm;
@@ -205,5 +270,6 @@ typedef struct {
 cpuid_t get_cpuid(void);
 romtable_pid_t get_romtable_pid(void);
 pid32_t get_pid32(void);
+cortex_m_romtable_t* get_romtable(void) ;
 
 #endif /* LIBHALGLUE_COMMON_ARM_CPUID_H_ */
